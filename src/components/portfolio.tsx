@@ -16,10 +16,14 @@ function ProjectVisual({ art, title }: { art: ProjectArt; title: string }) {
   return <div className="art art-shelf" role="img" aria-label={`${title} store interface placeholder`}><div className="shelf-browser"><div className="shelf-header"><b>THE TECH SHELF</b><span>Search&nbsp; Cart (0)</span></div><div className="shelf-main"><div><small>RELIABLE DIGITAL GOODS</small><b>Tools for your<br />digital life.</b><button>Explore store</button></div><div className="product-cube"><i /><i /><i /></div></div></div><p className="art-caption">Storefront / Screenshot placeholder</p></div>;
 }
 
+function LiveProjectPreview({ project, url }: { project: Project; url: string }) {
+  return <div className="live-preview"><div className="live-preview-bar"><span /><span /><span /><p>Live preview · {project.title}</p><a href={url} target="_blank" rel="noreferrer">Open ↗</a></div><iframe src={url} title={`${project.title} live website`} loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" referrerPolicy="no-referrer" /></div>;
+}
+
 function ProjectSection({ project, index }: { project: Project; index: number }) {
   const reduceMotion = useReducedMotion();
   return <motion.article className={`project ${index % 2 ? "project-reverse" : ""} ${project.featured ? "project-featured" : ""}`} initial={{ opacity: 0, y: reduceMotion ? 0 : 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.18 }} transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}>
-    <motion.div whileHover={reduceMotion ? undefined : { y: -5 }} transition={{ duration: 0.35 }}><ProjectVisual art={project.art} title={project.title} /></motion.div>
+    <motion.div whileHover={reduceMotion || project.embedUrl ? undefined : { y: -5 }} transition={{ duration: 0.35 }}>{project.embedUrl ? <LiveProjectPreview project={project} url={project.embedUrl} /> : <ProjectVisual art={project.art} title={project.title} />}</motion.div>
     <div className="project-copy"><p className="eyebrow">{project.eyebrow}</p><h3>{project.title}</h3><p className="project-description">{project.description}</p><ul>{project.features.slice(0, 3).map((feature) => <li key={feature}>{feature}</li>)}</ul><div className="tags">{project.tech.map((tech) => <span key={tech}>{tech}</span>)}</div><div className="project-links">{project.github && <a href={project.github} target="_blank" rel="noreferrer">View GitHub <ExternalArrow /></a>}{project.live && <a href={project.live} target="_blank" rel="noreferrer">View live site <ExternalArrow /></a>}</div></div>
   </motion.article>;
 }
