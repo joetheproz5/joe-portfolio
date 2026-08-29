@@ -20,6 +20,14 @@
 # production
 /build
 /dist
+/public/seven/
+/public/assets/
+/public/app.js
+/public/auth.css
+/public/icon.svg
+/public/manifest.webmanifest
+/public/styles.css
+/public/ui.css
 
 # misc
 .DS_Store

@@ -3,9 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "prebuild": "npm run prepare:seven && npm run prepare:yalout",
     "dev": "next dev",
     "build": "next build",
     "build:sites": "npm run build && node scripts/prepare-sites-build.mjs",
+    "prepare:seven": "node scripts/prepare-seven-demo.mjs",
+    "prepare:yalout": "node scripts/prepare-yalout-demo.mjs",
     "start": "next start",
     "lint": "eslint"
   },
