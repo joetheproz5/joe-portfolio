@@ -1,6 +1,5 @@
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
-import { rewriteSevenDemoAsset } from "./seven-demo-rewrite.mjs";
 
 const sourceRoot = "Web/";
 const outputRoot = "public/seven";
@@ -14,6 +13,19 @@ if (!treeResponse.ok) throw new Error(`Could not fetch the SEVEN source list (${
 const tree = await treeResponse.json();
 const files = tree.tree.filter((entry) => entry.type === "blob" && entry.path.startsWith(sourceRoot) && !ignored.some((pattern) => entry.path.includes(pattern)));
 
+function rewrite(filePath, content) {
+  if (filePath.endsWith("index.html")) return content.replaceAll('="/', '="./').replaceAll("='/", "='./");
+  if (filePath.endsWith(".css")) return content.replaceAll("url('/", "url('./").replaceAll('url("/', 'url("./');
+  if (filePath.endsWith("app.js")) return content
+    .replaceAll('"/assets/', '"./assets/')
+    .replaceAll('"/icon.svg"', '"./icon.svg"')
+    .replaceAll('"/service-worker.js', '"./service-worker.js')
+    .replaceAll('"/api/', '"./api/')
+    .replaceAll('`/api/', '`./api/');
+  if (filePath.endsWith(".webmanifest")) return content.replaceAll('"/', '"./');
+  return content;
+}
+
 await rm(outputRoot, { recursive: true, force: true });
 await Promise.all(files.map(async (file) => {
   const destination = join(outputRoot, file.path.slice(sourceRoot.length));
@@ -22,5 +34,5 @@ await Promise.all(files.map(async (file) => {
   const data = new Uint8Array(await response.arrayBuffer());
   await mkdir(dirname(destination), { recursive: true });
   const textFile = /\.(html|js|css|webmanifest)$/i.test(destination);
-  await writeFile(destination, textFile ? rewriteSevenDemoAsset(destination, new TextDecoder().decode(data)) : data);
+  await writeFile(destination, textFile ? rewrite(destination, new TextDecoder().decode(data)) : data);
 }));
